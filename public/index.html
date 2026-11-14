@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#07130f"><meta name="description" content="254 Mobile Arena — Kenyan mobile esports tournaments">
+<link rel="manifest" href="/manifest.json"><link rel="icon" href="/icon.svg" type="image/svg+xml">
+<title>254 Mobile Arena</title><link rel="stylesheet" href="/style.css">
+</head>
+<body>
+<header class="top">
+ <div class="brand"><div class="logo">254</div><div><h1>MOBILE ARENA</h1><p>KENYA'S MOBILE ESPORTS COMMUNITY</p></div></div>
+ <button id="installBtn" class="small hidden">＋ Install App</button>
+</header>
+<nav class="tabs">
+ <button class="tab active" data-page="play">🎮 Join Cup</button><button class="tab" data-page="scores">📊 Results</button><button class="tab" data-page="admin">🛡 Admin</button>
+</nav>
+<main>
+<section id="play" class="page active">
+ <div class="hero"><span class="eyebrow">PLAY • COMPETE • WIN</span><h2>Your game.<br><em>Your moment.</em></h2><p>Join mobile gaming tournaments across Kenya. Register, pay directly via M-Pesa Send Money and compete.</p><div class="hero-stats"><div><b>3</b><small>GAMES</small></div><div><b>254</b><small>COMMUNITY</small></div><div><b>24/7</b><small>ONLINE</small></div></div></div>
+ <div class="section-heading"><div><span class="eyebrow">LIVE COMPETITIONS</span><h2>Choose your arena</h2></div><button class="small" id="refresh">↻ Refresh</button></div>
+ <div id="tournaments" class="tournament-list"><div class="empty">Loading tournaments…</div></div>
+ <div class="card form-card"><span class="eyebrow">PLAYER ENTRY</span><h2>Register for a cup</h2>
+  <form id="registerForm">
+   <label>Your player name<input name="name" required maxlength="70" placeholder="e.g. AMOS ELly"></label>
+   <label>M-Pesa phone number<input name="phone" required inputmode="tel" placeholder="0712345678"></label>
+   <label>Game ID / UID<input name="gameId" required maxlength="80" placeholder="Your in-game username or UID"></label>
+   <label>Select tournament<select name="tournamentId" id="tournamentSelect" required><option value="">Loading…</option></select></label>
+   <button class="primary" type="submit">Register & Get Payment Instructions</button>
+  </form><div id="registerMessage" class="notice" aria-live="polite"></div>
+  <div id="paymentPanel" class="card hidden">
+   <span class="eyebrow">M-PESA PAYMENT</span><h3>Pay using Send Money</h3>
+   <p>Send the exact tournament entry fee to this M-Pesa number:</p>
+   <div class="payment-number"><strong id="receiveNumber">0143222805</strong><button type="button" class="small" id="copyNumber">Copy number</button></div>
+   <p class="fine">Use the name shown by M-Pesa to confirm the recipient before sending. Keep your transaction code.</p>
+   <form id="paymentForm"><label>M-Pesa transaction code<input name="transactionCode" required maxlength="12" minlength="8" autocapitalize="characters" placeholder="e.g. QWE12ABC34"></label><button class="primary">Submit payment code</button></form>
+   <div id="paymentMessage" class="notice" aria-live="polite"></div>
+  </div>
+  <p class="fine">Your entry remains pending until the admin checks the payment in M-Pesa. Never share your M-Pesa PIN or OTP with anyone.</p>
+ </div>
+</section>
+<section id="scores" class="page"><div class="section-heading"><div><span class="eyebrow">THE LEADERBOARD</span><h2>Latest results</h2></div></div><div id="results" class="card"><div class="empty">Loading results…</div></div></section>
+<section id="admin" class="page">
+ <div class="card form-card"><span class="eyebrow">ARENA CONTROL</span><h2>Admin dashboard</h2><form id="loginForm"><label>Admin email<input name="email" type="email" required placeholder="admin@254arena.co.ke"></label><label>Password<input name="password" type="password" required placeholder="Admin password"></label><button class="primary">Sign in</button></form><div id="adminMessage" class="notice"></div></div>
+ <div id="adminPanel" class="hidden">
+  <div class="stats" id="adminStats"></div>
+  <div class="card"><div class="section-heading"><h2>Registrations</h2><button id="logout" class="small">Sign out</button></div><div id="registrationTable" class="table-wrap"></div></div>
+  <div class="card"><h2>Create tournament</h2><form id="tournamentForm" class="two-col">
+   <label>Game<input name="game" required placeholder="eFootball"></label><label>Tournament title<input name="title" required></label>
+   <label>Format<input name="format" placeholder="1v1 Knockout"></label><label>Entry fee (KES)<input name="entryFee" type="number" min="0" required></label>
+   <label>Prize description<input name="prize" placeholder="KES 1,500"></label><label>Maximum players<input name="maxPlayers" type="number" min="2" required></label>
+   <label class="wide">Start time<input name="startsAt" required placeholder="Saturday · 8:00 PM EAT"></label><button class="primary wide">Create tournament</button>
+  </form><div id="tournamentMessage" class="notice"></div></div>
+  <div class="card"><h2>Publish result</h2><form id="resultForm"><label>Tournament<select name="tournamentId" id="resultTournament"></select></label><label>Player name<input name="playerName" required></label><label>Position<input name="position" required placeholder="1st place"></label><label>Score<input name="score" placeholder="3–1"></label><button class="primary">Save result</button></form><div id="resultMessage" class="notice"></div></div>
+ </div>
+</section>
+</main>
+<footer><b>🏆 254 MOBILE ARENA</b><p>Compete fairly. Respect every player. Play responsibly.</p><small>© 2026 254 Mobile Arena</small></footer>
+<div id="toast" class="toast" role="status"></div>
+<script src="/app.js"></script>
+</body></html>
+  
