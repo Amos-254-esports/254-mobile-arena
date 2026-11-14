@@ -1,46 +1,44 @@
 # 254 Mobile Arena
 
-Installable mobile-first tournament website for eFootball, Free Fire and PUBG Mobile. Includes player registration, SQLite persistence, admin dashboard, results publishing, and Safaricom Daraja STK Push integration.
+Installable mobile-first esports tournament website for eFootball, Free Fire and PUBG Mobile. Includes player registration, tournament listings, SQLite storage, an admin dashboard, results publishing, and **manual M-Pesa Send Money** payment submission and verification.
+
+## Payment flow (no Till or Paybill required for this version)
+1. A player registers for an open tournament.
+2. The site displays the receiving number configured by `MPESA_RECEIVE_NUMBER` (default: `0143222805`) and the entry fee.
+3. The player uses M-Pesa Send Money and submits the transaction code.
+4. An administrator checks the payment in the M-Pesa account and approves or rejects it in the admin dashboard.
+
+The transaction code is not automatically verified. Never ask players for their M-Pesa PIN or OTP. The receiving phone number is displayed publicly on the website. Confirm that the line can receive payments and that you are comfortable publishing it before launch.
 
 ## Requirements
 - Node.js 20+
 - A host with persistent disk storage (SQLite database is stored in `data/`)
-- Public HTTPS URL for production M-Pesa callbacks and PWA installation
+- Public HTTPS URL for deployment and installable PWA support
 
 ## Run locally
 1. Install Node.js.
 2. Copy `.env.example` to `.env`.
-3. Set a strong `JWT_SECRET`, `ADMIN_EMAIL`, and `ADMIN_PASSWORD`.
+3. Set a strong random `JWT_SECRET`, `ADMIN_EMAIL`, and `ADMIN_PASSWORD`.
 4. Run `npm install`.
 5. Run `npm start`.
 6. Open `http://localhost:3000`.
 
-M-Pesa is intentionally not active until Daraja credentials and a reachable HTTPS callback URL are configured. Use Safaricom Daraja sandbox credentials for testing first.
+## Environment settings
+- `PORT`: supplied by the host or `3000` locally.
+- `JWT_SECRET`: replace with a long random secret.
+- `ADMIN_EMAIL` and `ADMIN_PASSWORD`: set your private administrator login. Do not use the sample password.
+- `MPESA_RECEIVE_NUMBER`: receiving M-Pesa phone number; currently defaults to `0143222805`.
 
-## M-Pesa setup
-Create/configure a Daraja app with the appropriate Lipa na M-Pesa Online (STK Push) product. Set:
-- `MPESA_ENV=sandbox` for testing, then `production` only after approval
-- `MPESA_CONSUMER_KEY`
-- `MPESA_CONSUMER_SECRET`
-- `MPESA_SHORTCODE`
-- `MPESA_PASSKEY`
-- `MPESA_CALLBACK_URL=https://YOUR-DOMAIN/api/mpesa/callback`
-
-The callback endpoint must be publicly reachable over HTTPS. Do not expose credentials in browser JavaScript or share them in chat. The app marks a registration paid only after a successful Daraja callback.
-
-## Admin
-Use the email/password configured in `.env` on the Admin tab. Change the example password before deployment. The admin cookie is HTTP-only and expires after 8 hours.
+Daraja STK Push credentials are not needed for this manual Send Money version. The app includes a legacy callback endpoint, but it is not used by the manual payment flow.
 
 ## Deployment notes
 - Deploy the Node app to a service that supports Node 20 and persistent storage.
-- Add all `.env` variables in the host's secret/environment settings.
-- Set `BASE_URL` and the exact public `MPESA_CALLBACK_URL`.
-- Enable HTTPS.
-- Back up `data/arena.sqlite`.
-- Keep `MPESA_ENV=sandbox` until end-to-end test payments succeed.
-- For production, add rate limiting, CSRF protection, audit logging, stronger callback reconciliation, and a managed database before handling significant funds.
+- Set the environment variables in the host's secret/environment settings.
+- Enable HTTPS and back up `data/arena.sqlite` regularly.
+- Do not use an ephemeral filesystem for the SQLite database; registrations and results could be lost when the host restarts or redeploys.
+- Before accepting real entry fees, test the complete registration and manual payment verification process with a small test tournament.
+- Add rate limiting, CSRF protection, audit logging, and a managed database before handling significant funds.
 
 ## Important
 - Tournament names, prizes, slot counts and schedules are editable demo defaults. Replace them with confirmed event details before advertising.
-- No real room IDs, passwords, paybill or till number are prefilled.
-- This is a deployable starter application, not a hosted live service. M-Pesa cannot transact until the owner supplies valid Daraja credentials and deploys the callback endpoint.
+- This is a deployable starter application, not a hosted live service. It must be deployed before players can access it online.
