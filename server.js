@@ -199,6 +199,27 @@ app.patch("/api/admin/tournaments/:id",adminOnly,(req,res)=>{
   res.json({message:"Tournament updated."});
 });
 app.post("/api/admin/results",adminOnly,(req,res)=>{
+
+app.delete("/api/admin/results/:id", adminOnly, (req,res)=>{
+  const id = Number(req.params.id);
+
+  if (!Number.isInteger(id) || id < 1) {
+    return res.status(400).json({error:"Invalid result ID."});
+  }
+
+  const result = db.prepare(
+    "SELECT id FROM results WHERE id=?"
+  ).get(id);
+
+  if (!result) {
+    return res.status(404).json({error:"Result not found."});
+  }
+
+  db.prepare("DELETE FROM results WHERE id=?").run(id);
+
+  res.json({message:"Result deleted successfully."});
+});
+
   const id=Number(req.body.tournamentId), name=clean(req.body.playerName,70), position=clean(req.body.position,30), score=clean(req.body.score,30);
   if(!id||!name||!position) return res.status(400).json({error:"Complete result details."});
   db.prepare("INSERT INTO results(tournament_id,player_name,position,score) VALUES(?,?,?,?)").run(id,name,position,score);
