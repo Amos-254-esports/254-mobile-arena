@@ -43,11 +43,49 @@ $("#paymentForm").addEventListener("submit",async e=>{
 async function loadResults(){try{const rows=await api("/api/results");$("#results").innerHTML=rows.length?`<div class="table-wrap"><table><thead><tr><th>Tournament</th><th>Player</th><th>Position</th><th>Score</th></tr></thead><tbody>${rows.map(r=>`<tr><td>${esc(r.title)}</td><td>${esc(r.player_name)}</td><td>${esc(r.position)}</td><td>${esc(r.score)}</td></tr>`).join("")}</tbody></table></div>`:'<div class="empty">Results will appear here after tournaments are completed.</div>'}catch(e){$("#results").textContent=e.message}}
 $("#loginForm").addEventListener("submit",async e=>{e.preventDefault();try{await api("/api/admin/login",{method:"POST",body:JSON.stringify(Object.fromEntries(new FormData(e.target)))});notice("#adminMessage","Signed in successfully.");await checkAdmin()}catch(err){notice("#adminMessage",err.message,true)}});
 async function checkAdmin(){try{const d=await api("/api/admin/summary");$("#adminPanel").classList.remove("hidden");$("#adminStats").innerHTML=[["Players",d.totals.players],["Paid entries",d.totals.paid],["Pending",d.totals.pending],["Revenue","KES "+d.totals.revenue.toLocaleString()]].map(x=>`<div class="stat"><b>${x[1]}</b><small>${x[0]}</small></div>`).join("");$("#registrationTable").innerHTML=`<table><thead><tr><th>Name</th><th>Tournament</th><th>Phone</th><th>Amount</th><th>Status</th><th>M-Pesa code</th><th>Verify</th></tr></thead><tbody>${d.registrations.map(r=>`<tr><td>${esc(r.name)}</td><td>${esc(r.title)}</td><td>${esc(r.phone)}</td><td>KES ${r.amount}</td><td>${esc(r.payment_status)}</td><td>${esc(r.payment_reference||r.mpesa_receipt||"—")}</td><td>${r.payment_status==="Submitted"?`<button class="small" data-payment-id="${r.id}" data-status="Paid">Approve</button> <button class="small" data-payment-id="${r.id}" data-status="Failed">Reject</button>`:"—"}</td></tr>`).join("")}</tbody></table>`}catch{$("#adminPanel").classList.add("hidden")}}
-$("#registrationTable").addEventListener("click",async e=>{
+await loadAdminResults();$("#registrationTable").addEventListener("click",async e=>{
  const b=e.target.closest("button[data-payment-id]");if(!b)return;
  if(!confirm(`Mark this submitted payment as ${b.dataset.status}? Verify the transaction in M-Pesa first.`))return;
  try{await api(`/api/admin/registrations/${b.dataset.paymentId}/payment`,{method:"PATCH",body:JSON.stringify({status:b.dataset.status})});toast("Payment status updated.");await checkAdmin();await loadTournaments()}catch(err){toast(err.message)}
 });
+
+async function loadAdminResults(){
+ try{
+  const rows=await api("/api/results");
+  $("#adminResults").innerHTML=rows.length?`
+   <table>
+    <thead><tr><th>Tournament</th><th>Player</th><th>Position</th><th>Score</th><th>Action</th></tr></thead>
+    <tbody>
+     ${rows.map(r=>`
+      <tr>
+       <td>${esc(r.title)}</td>
+       <td>${esc(r.player_name)}</td>
+       <td>${esc(r.position)}</td>
+       <td>${esc(r.score)}</td>
+       <td><button class="small" data-delete-result="${r.id}">Delete</button></td>
+      </tr>
+     `).join("")}
+    </tbody>
+   </table>`:'<div class="empty">No results published yet.</div>';
+ }catch(e){
+  $("#adminResults").textContent=e.message;
+ }
+}
+
+$("#adminResults").addEventListener("click",async e=>{
+ const b=e.target.closest("button[data-delete-result]");
+ if(!b)return;
+ if(!confirm("Are you sure you want to delete this result?"))return;
+ try{
+  await api(`/api/admin/results/${b.dataset.deleteResult}`,{method:"DELETE"});
+  toast("Result deleted.");
+  await loadAdminResults();
+  await loadResults();
+ }catch(err){
+  toast(err.message);
+ }
+});
+
 $("#logout").onclick=async()=>{await api("/api/admin/logout",{method:"POST"});$("#adminPanel").classList.add("hidden");toast("Signed out.")};
 $("#tournamentForm").addEventListener("submit",async e=>{e.preventDefault();const f=Object.fromEntries(new FormData(e.target));try{await api("/api/admin/tournaments",{method:"POST",body:JSON.stringify(f)});notice("#tournamentMessage","Tournament created.");e.target.reset();await loadTournaments();await checkAdmin()}catch(err){notice("#tournamentMessage",err.message,true)}});
 $("#resultForm").addEventListener("submit",async e=>{e.preventDefault();try{await api("/api/admin/results",{method:"POST",body:JSON.stringify(Object.fromEntries(new FormData(e.target)))});notice("#resultMessage","Result published.");e.target.reset()}catch(err){notice("#resultMessage",err.message,true)}});
