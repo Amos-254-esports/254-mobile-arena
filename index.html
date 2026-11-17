@@ -41,7 +41,46 @@
    <label>Format<input name="format" placeholder="1v1 Knockout"></label><label>Entry fee (KES)<input name="entryFee" type="number" min="0" required></label>
    <label>Prize description<input name="prize" placeholder="KES 1,500"></label><label>Maximum players<input name="maxPlayers" type="number" min="2" required></label>
    <label class="wide">Start time<input name="startsAt" required placeholder="Saturday · 8:00 PM EAT"></label><button class="primary wide">Create tournament</button>
-  </form><div id="tournamentMessage" class="notice"></div></div>
+  
+</form>
+
+<div id="registerMessage" class="notice" aria-live="polite"></div>
+
+<div id="paymentPanel" class="card form-card hidden">
+  <span class="eyebrow">M-PESA PAYMENT</span>
+  <h2>Complete your entry</h2>
+
+  <p>Send your tournament entry fee to:</p>
+
+  <h2 id="receiveNumber">Loading...</h2>
+
+  <button type="button" id="copyNumber" class="small">
+    Copy M-Pesa Number
+  </button>
+
+  <p class="fine">
+    After making payment, enter your M-Pesa transaction code below.
+  </p>
+
+  <form id="paymentForm">
+    <label>M-Pesa transaction code
+      <input
+        name="transactionCode"
+        required
+        maxlength="12"
+        minlength="8"
+        placeholder="e.g. ABC123XYZ"
+        autocomplete="off">
+    </label>
+
+    <button class="primary" type="submit">
+      Submit Payment Code
+    </button>
+  </form>
+
+  <div id="paymentMessage" class="notice" aria-live="polite"></div>
+</div>
+
   <div class="card"><h2>Publish result</h2><form id="resultForm"><label>Tournament<select name="tournamentId" id="resultTournament"></select></label><label>Player name<input name="playerName" required></label><label>Position<input name="position" required placeholder="1st place"></label><label>Score<input name="score" placeholder="3–1"></label><button class="primary">Save result</button></form><div id="resultMessage" class="notice"></div></div>
  </div>
 </section>
